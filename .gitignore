@@ -1,0 +1,11 @@
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Runtime data files (auto-generated)
+data.json.bak
+*.tmp
+
+# macOS metadata
+.DS_Store
