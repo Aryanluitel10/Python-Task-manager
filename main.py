@@ -3,8 +3,10 @@ import os
 import shutil
 import tempfile
 
-DATA_FILE = 'data.json'
-BACKUP_FILE = 'data.json.bak'
+# Vercel's filesystem is read-only — use /tmp for data storage when deployed
+_ON_VERCEL  = bool(os.environ.get("VERCEL"))
+DATA_FILE   = "/tmp/data.json"   if _ON_VERCEL else "data.json"
+BACKUP_FILE = "/tmp/data.json.bak" if _ON_VERCEL else "data.json.bak"
 
 def load_data():
     """
