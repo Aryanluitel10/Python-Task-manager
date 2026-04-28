@@ -1,59 +1,86 @@
 # Python Task Manager
 
-A multi-user command-line task manager built in Python. No installation or internet required — everything runs locally and saves to a plain file on your computer.
+A multi-user task manager built in Python — available as a **web app**, a **graphical desktop app (GUI)**, and a **command-line app (CLI)**.
+
+---
 
 ## Features
 
-- Create personal accounts and log in securely
-- Add tasks with a title, description, due date, priority, and status
-- View, edit, delete, and mark tasks as complete
+- Create personal accounts and sign in securely
+- Add tasks with title, description, due date, priority, and status
+- Edit, delete, and mark tasks as complete
 - Search tasks by keyword
-- Filter tasks by priority (Low / Medium / High) or status (Todo / In Progress / Done)
-- All data saved automatically — nothing is lost if the program closes unexpectedly
-- Optional graphical interface (GUI) included
+- Filter by priority (Low / Medium / High) or status (Todo / In Progress / Done)
+- Live stats bar with completion progress
+- All data saved automatically to a local file
 
-## Files
+---
 
-| File | Purpose |
-|---|---|
-| `main.py` | Command-line version — run this to use the app in the terminal |
-| `gui.py` | Graphical version — run this for a clickable window interface |
-| `test_main.py` | Automated tests — run this to verify everything works |
-| `data.json` | Where all user accounts and tasks are saved |
-| `project_report.md` | Full project write-up |
+## Project Structure
+
+| File / Folder     | Purpose                                                   |
+|-------------------|-----------------------------------------------------------|
+| `app.py`          | Flask web server — REST API + serves the frontend         |
+| `main.py`         | Core data logic (load/save) + CLI version                 |
+| `gui.py`          | Tkinter desktop GUI version                               |
+| `test_main.py`    | Automated unit tests                                      |
+| `templates/`      | HTML template for the web app                             |
+| `static/`         | CSS and JavaScript for the web app                        |
+| `project_report.md` | Full project write-up                                   |
+
+> `data.json` is created automatically on first run and is excluded from version control (contains user passwords).
+
+---
 
 ## How to Run
 
-**Requirements:** Python 3.6 or newer. No extra packages needed.
+### Web App (recommended)
 
-**Terminal (CLI) version:**
+**Requirements:** Python 3.6+ and Flask
+
 ```bash
-python3 main.py
+pip3 install flask
+python3 app.py
 ```
 
-**Graphical (GUI) version:**
+Then open **http://localhost:8080** in your browser.
+
+---
+
+### Desktop GUI
+
+**Requirements:** Python 3.6+ (Tkinter is included with Python)
+
 ```bash
 python3 gui.py
 ```
 
-**Run tests:**
+---
+
+### Command-Line (CLI)
+
+**Requirements:** Python 3.6+, no extra packages
+
+```bash
+python3 main.py
+```
+
+---
+
+### Run Tests
+
 ```bash
 python3 -m unittest test_main -v
 ```
 
-## How It Works
-
-1. Start the program and create an account
-2. Log in with your username and password
-3. Use the numbered menu to manage your tasks
-4. All changes are saved automatically to `data.json`
+---
 
 ## Task Fields
 
-| Field | Options |
-|---|---|
-| Title | Any text (required) |
-| Description | Any text (optional) |
-| Due Date | YYYY-MM-DD format (optional) |
-| Priority | Low, Medium, High |
-| Status | Todo, In Progress, Done |
+| Field       | Options / Format               |
+|-------------|-------------------------------|
+| Title       | Any text (required)           |
+| Description | Any text (optional)           |
+| Due Date    | YYYY-MM-DD (optional)         |
+| Priority    | Low · Medium · High           |
+| Status      | Todo · In Progress · Done     |

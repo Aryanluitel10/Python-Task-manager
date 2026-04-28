@@ -3,7 +3,8 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Runtime data files (auto-generated)
+# Runtime data files (auto-generated, contain user passwords)
+data.json
 data.json.bak
 *.tmp
 

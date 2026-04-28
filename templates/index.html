@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Manager</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <!-- ── TOAST ─────────────────────────────────────────────────────────────── -->
+  <div id="toast-container"></div>
+
+  <!-- ── LOGIN SCREEN ──────────────────────────────────────────────────────── -->
+  <div id="login-screen" class="screen">
+    <div class="login-left">
+      <div class="login-brand">
+        <div class="brand-icon">✔</div>
+        <h1 class="brand-title">Task Manager</h1>
+        <p class="brand-sub">Stay organised.<br>Get things done.</p>
+        <ul class="feature-list">
+          <li><span class="feat-arrow">›</span> Multi-user accounts</li>
+          <li><span class="feat-arrow">›</span> Priority &amp; due dates</li>
+          <li><span class="feat-arrow">›</span> Search &amp; filter tasks</li>
+          <li><span class="feat-arrow">›</span> Auto-saves everything</li>
+        </ul>
+      </div>
+    </div>
+    <div class="login-right">
+      <div class="login-form-wrap">
+        <h2 class="form-title">Welcome back</h2>
+        <p class="form-sub">Sign in to your account</p>
+
+        <label class="field-label">USERNAME</label>
+        <div class="input-icon-wrap">
+          <span class="input-icon">👤</span>
+          <input id="login-user" type="text" class="field-input input-with-icon" placeholder="Enter your username" autocomplete="username" />
+        </div>
+
+        <label class="field-label">PASSWORD</label>
+        <div class="input-icon-wrap">
+          <span class="input-icon">🔒</span>
+          <input id="login-pass" type="password" class="field-input input-with-icon" placeholder="Enter your password" autocomplete="current-password" />
+        </div>
+
+        <p id="login-error" class="error-msg"></p>
+
+        <button class="btn btn-accent btn-full" style="margin-top:6px" onclick="doLogin()">Sign In</button>
+        <div class="login-divider"><span>or</span></div>
+        <button class="btn btn-outline btn-full" onclick="openRegisterModal()">Create a free account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MAIN APP SCREEN ───────────────────────────────────────────────────── -->
+  <div id="app-screen" class="screen hidden">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <span class="header-logo">✔</span>
+        Task Manager
+      </div>
+      <div class="header-right">
+        <div class="avatar-wrap">
+          <div class="avatar" id="user-avatar">A</div>
+          <span id="user-name-label" class="user-name-label"></span>
+        </div>
+        <button class="btn btn-ghost-danger btn-sm" onclick="doLogout()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- Stats bar -->
+    <div class="stats-bar">
+      <div class="stat-cell">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label">Total Tasks</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-cell">
+        <div class="stat-num stat-todo" id="stat-todo">0</div>
+        <div class="stat-label">To Do</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-cell">
+        <div class="stat-num stat-inprog" id="stat-inprog">0</div>
+        <div class="stat-label">In Progress</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-cell">
+        <div class="stat-num stat-done" id="stat-done">0</div>
+        <div class="stat-label">Done</div>
+      </div>
+      <div class="stat-progress-wrap">
+        <div class="stat-progress-label" id="stat-pct">0% complete</div>
+        <div class="stat-progress-track">
+          <div class="stat-progress-fill" id="stat-progress-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-search-wrap">
+        <svg class="toolbar-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="search-input" type="text" class="toolbar-input" placeholder="Search tasks…" oninput="renderTable()" />
+      </div>
+
+      <div class="toolbar-filters">
+        <select id="filter-priority" class="toolbar-select" onchange="renderTable()">
+          <option value="All">All Priorities</option>
+          <option>High</option>
+          <option>Medium</option>
+          <option>Low</option>
+        </select>
+        <select id="filter-status" class="toolbar-select" onchange="renderTable()">
+          <option value="All">All Statuses</option>
+          <option>Todo</option>
+          <option>In Progress</option>
+          <option>Done</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="clearFilters()">Clear filters</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table class="task-table">
+        <thead>
+          <tr>
+            <th class="col-check"></th>
+            <th class="col-title">Title</th>
+            <th class="col-priority">Priority</th>
+            <th class="col-status">Status</th>
+            <th class="col-due">Due Date</th>
+            <th class="col-desc">Description</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="task-tbody"></tbody>
+      </table>
+      <div id="empty-state" class="empty-state hidden">
+        <div class="empty-icon">📋</div>
+        <p class="empty-title">No tasks yet</p>
+        <p class="empty-sub">Click <strong>+ Add Task</strong> to create your first task</p>
+      </div>
+    </div>
+
+    <!-- Action bar -->
+    <div class="action-bar">
+      <button class="action-btn action-btn-add" onclick="openAddModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Task
+      </button>
+      <button class="action-btn action-btn-edit" onclick="editSelected()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit
+      </button>
+      <button class="action-btn action-btn-complete" onclick="completeSelected()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Mark as Complete
+      </button>
+      <button class="action-btn action-btn-delete" onclick="deleteSelected()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Delete
+      </button>
+      <span class="action-hint">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        Click a row to select · Double-click to edit
+      </span>
+      <span class="status-text" id="status-text"></span>
+    </div>
+  </div>
+
+  <!-- ── ADD / EDIT TASK MODAL ──────────────────────────────────────────────── -->
+  <div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="modal-header" id="modal-title-bar">
+        <span id="modal-header-icon">✚</span>
+        <span id="modal-header-text">Add New Task</span>
+        <button class="modal-close-btn" onclick="closeModalDirect()">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <label class="field-label">TITLE <span class="required">*</span></label>
+        <input id="modal-title" type="text" class="field-input" placeholder="What needs to be done?" />
+
+        <label class="field-label">DESCRIPTION</label>
+        <textarea id="modal-desc" class="field-textarea" rows="3" placeholder="Add more details (optional)…"></textarea>
+
+        <div class="modal-row">
+          <div class="modal-col">
+            <label class="field-label">DUE DATE</label>
+            <input id="modal-due" type="date" class="field-input" />
+          </div>
+          <div class="modal-col">
+            <label class="field-label">PRIORITY</label>
+            <select id="modal-priority" class="field-select">
+              <option>Low</option>
+              <option selected>Medium</option>
+              <option>High</option>
+            </select>
+          </div>
+          <div class="modal-col">
+            <label class="field-label">STATUS</label>
+            <select id="modal-status" class="field-select">
+              <option selected>Todo</option>
+              <option>In Progress</option>
+              <option>Done</option>
+            </select>
+          </div>
+        </div>
+
+        <p id="modal-error" class="error-msg"></p>
+
+        <div class="modal-footer">
+          <button class="btn btn-muted" onclick="closeModalDirect()">Cancel</button>
+          <button class="btn btn-accent" onclick="saveModal()" id="modal-save-btn">Save Task</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MARK AS COMPLETE CONFIRM ───────────────────────────────────────────── -->
+  <div id="complete-overlay" class="modal-overlay hidden" onclick="closeCompleteConfirm(event)">
+    <div class="modal-box confirm-box" onclick="event.stopPropagation()">
+      <div class="modal-header complete-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Mark as Complete
+        <button class="modal-close-btn" onclick="closeCompleteConfirmDirect()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="confirm-icon-wrap complete-icon-wrap">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="16 10 11 15 8 12"/></svg>
+        </div>
+        <p class="confirm-title">Mark task as complete?</p>
+        <p class="confirm-sub" id="complete-task-name"></p>
+        <p class="confirm-note">This will change the status to <strong>Done</strong>.</p>
+        <div class="modal-footer">
+          <button class="btn btn-muted" onclick="closeCompleteConfirmDirect()">Cancel</button>
+          <button class="btn btn-success" onclick="confirmCompleteYes()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Yes, Mark as Complete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DELETE CONFIRM ────────────────────────────────────────────────────── -->
+  <div id="confirm-overlay" class="modal-overlay hidden" onclick="closeConfirm(event)">
+    <div class="modal-box confirm-box" onclick="event.stopPropagation()">
+      <div class="modal-header confirm-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Delete Task
+        <button class="modal-close-btn" onclick="closeConfirmDirect()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="confirm-icon-wrap delete-icon-wrap">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        </div>
+        <p class="confirm-title">Delete this task?</p>
+        <p class="confirm-sub" id="confirm-task-name"></p>
+        <p class="confirm-note">This action <strong>cannot be undone</strong>.</p>
+        <div class="modal-footer">
+          <button class="btn btn-muted" onclick="closeConfirmDirect()">Cancel</button>
+          <button class="btn btn-danger" onclick="confirmDeleteYes()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            Yes, Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── REGISTER MODAL ────────────────────────────────────────────────────── -->
+  <div id="register-overlay" class="modal-overlay hidden" onclick="closeRegisterModal(event)">
+    <div class="modal-box register-box" onclick="event.stopPropagation()">
+      <div class="modal-header register-header">
+        <span class="register-header-icon">✔</span>
+        Create your account
+        <button class="modal-close-btn" onclick="closeRegisterDirect()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="register-sub">Fill in the details below to get started for free.</p>
+
+        <label class="field-label">USERNAME</label>
+        <div class="input-icon-wrap">
+          <span class="input-icon">👤</span>
+          <input id="reg-user" type="text" class="field-input input-with-icon" placeholder="Choose a username" autocomplete="off" />
+        </div>
+
+        <label class="field-label">PASSWORD</label>
+        <div class="input-icon-wrap">
+          <span class="input-icon">🔒</span>
+          <input id="reg-pass" type="password" class="field-input input-with-icon" placeholder="Create a password" autocomplete="new-password" />
+        </div>
+        <div class="password-strength">
+          <div class="strength-track"><div class="strength-fill" id="strength-fill"></div></div>
+          <span class="strength-label" id="strength-label"></span>
+        </div>
+
+        <label class="field-label">CONFIRM PASSWORD</label>
+        <div class="input-icon-wrap">
+          <span class="input-icon">🔒</span>
+          <input id="reg-confirm" type="password" class="field-input input-with-icon" placeholder="Re-enter your password" autocomplete="new-password" />
+        </div>
+        <div class="match-hint" id="match-hint"></div>
+
+        <ul class="password-rules">
+          <li id="rule-len"  class="rule">At least 6 characters</li>
+          <li id="rule-num"  class="rule">Contains a number</li>
+          <li id="rule-case" class="rule">Contains uppercase &amp; lowercase</li>
+        </ul>
+
+        <p id="reg-error" class="error-msg"></p>
+
+        <div class="modal-footer" style="margin-top:18px">
+          <button class="btn btn-muted" onclick="closeRegisterDirect()">Cancel</button>
+          <button class="btn btn-success btn-full" onclick="doRegister()">Create Account</button>
+        </div>
+        <p class="register-signin-link">Already have an account? <a href="#" onclick="closeRegisterDirect(); return false;">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
