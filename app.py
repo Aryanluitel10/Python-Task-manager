@@ -10,6 +10,7 @@ Usage:
     Then open http://localhost:8080 in your browser.
 """
 
+import os
 from flask import Flask, request, jsonify, render_template
 import main as backend
 
@@ -188,5 +189,6 @@ def complete_task(username, idx):
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    print("Task Manager running at http://localhost:8080")
-    app.run(debug=True, host="0.0.0.0", port=8080)
+    port = int(os.environ.get("PORT", 8080))
+    print(f"Task Manager running at http://localhost:{port}")
+    app.run(debug=False, host="0.0.0.0", port=port)
